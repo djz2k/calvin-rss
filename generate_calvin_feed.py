@@ -1,8 +1,8 @@
-
 from datetime import datetime, timedelta
 from pathlib import Path
 import requests
 import json
+import html  # ← For escaping special characters
 
 # === Config ===
 START_DATE = datetime(1985, 11, 18)
@@ -47,21 +47,29 @@ def find_next_comic(used_dates):
         current += timedelta(days=1)
 
 def write_rss(comic_url, pub_date):
+    # Escape special characters
+    title = html.escape(f"Calvin and Hobbes – {pub_date}")
+    link = html.escape(SITE_LINK)
+    guid = html.escape(comic_url)
+    pub_date_escaped = html.escape(pub_date)
+
+    description = f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
+
     rss = f'''<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-  <title>{FEED_TITLE}</title>
-  <link>{FEED_LINK}</link>
-  <description>{FEED_DESC}</description>
+  <title>{html.escape(FEED_TITLE)}</title>
+  <link>{html.escape(FEED_LINK)}</link>
+  <description>{html.escape(FEED_DESC)}</description>
   <language>en-us</language>
-  <pubDate>{pub_date}</pubDate>
-  <lastBuildDate>{pub_date}</lastBuildDate>
+  <pubDate>{pub_date_escaped}</pubDate>
+  <lastBuildDate>{pub_date_escaped}</lastBuildDate>
   <item>
-    <title>Calvin and Hobbes – {pub_date}</title>
-    <link>{SITE_LINK}</link>
-    <guid>{comic_url}</guid>
-    <pubDate>{pub_date}</pubDate>
-    <description><![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]></description>
+    <title>{title}</title>
+    <link>{link}</link>
+    <guid>{guid}</guid>
+    <pubDate>{pub_date_escaped}</pubDate>
+    <description>{description}</description>
     <enclosure url="{comic_url}" type="image/gif" />
   </item>
 </channel>
@@ -69,7 +77,7 @@ def write_rss(comic_url, pub_date):
     Path(RSS_FILE).write_text(rss)
 
 def write_html(comic_url):
-    html = f'''<!DOCTYPE html>
+    html_text = f'''<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
@@ -83,7 +91,7 @@ def write_html(comic_url):
   <img src="{comic_url}" alt="Calvin and Hobbes comic"/>
 </body>
 </html>'''
-    Path(HTML_FILE).write_text(html)
+    Path(HTML_FILE).write_text(html_text)
 
 # === Main ===
 
