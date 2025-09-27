@@ -30,23 +30,22 @@ def get_all_comics():
         print("[ERROR] Failed to fetch the HTML page.")
         return []
 
-    preview = response.text[:500]
-    print(f"[DEBUG] HTML starts with:\n{preview}\n--- END PREVIEW ---")
+    html_snippet = response.text[:1000]
+    print(f"[DEBUG] HTML Snippet:\n{html_snippet}\n--- END HTML PREVIEW ---")
 
     soup = BeautifulSoup(response.text, "html.parser")
     imgs = soup.find_all("img")
     print(f"[DEBUG] Found {len(imgs)} <img> tags")
 
     for i, img in enumerate(imgs[:5]):
-        print(f"[DEBUG] img[{i}].src = {img.get('src')}")
+        print(f"[DEBUG] img[{i}]: {img.get('src')}")
 
-    comic_imgs = []
-    for img in imgs:
-        src = img.get("src", "")
-        if "calvinandhobbes" in src or "assets.s-anand.net" in src:
-            comic_imgs.append(src)
+    comic_imgs = [
+        img["src"] for img in imgs
+        if img.get("src") and ("calvinandhobbes" in img["src"] or "assets.s-anand.net" in img["src"])
+    ]
+    print(f"[DEBUG] Filtered {len(comic_imgs)} Calvin & Hobbes comic image URLs")
 
-    print(f"[DEBUG] Found {len(comic_imgs)} Calvin & Hobbes comic image URLs")
     return comic_imgs
 
 def load_used():
