@@ -16,14 +16,22 @@ FEED_DESC = "One Calvin & Hobbes comic per day"
 
 # === Comic Logic ===
 def get_all_comics():
-    html = requests.get(HTML_URL).text
-    soup = BeautifulSoup(html, "html.parser")
+    response = requests.get(HTML_URL)
+    print(f"[DEBUG] Status code: {response.status_code}")
+    html = response.text[:1000]  # print only first 1000 chars
+    print(f"[DEBUG] Page snippet:\n{html}\n--- END SNIPPET ---")
+
+    soup = BeautifulSoup(response.text, "html.parser")
     imgs = soup.find_all("img")
-    print(f"[INFO] Found {len(imgs)} total images on page.")
-    
-    comic_imgs = [img["src"] for img in imgs if "assets.s-anand.net/calvinandhobbes" in img["src"]]
+    print(f"[INFO] Found {len(imgs)} total <img> tags")
+
+    # print first 3 image URLs
+    for i, img in enumerate(imgs[:3]):
+        print(f"[DEBUG] Image {i+1}: {img.get('src')}")
+
+    comic_imgs = [img["src"] for img in imgs if "assets.s-anand.net/calvinandhobbes" in img.get("src", "")]
     print(f"[INFO] Found {len(comic_imgs)} Calvin & Hobbes comic images.")
-    
+
     return comic_imgs
 
 def load_used():
