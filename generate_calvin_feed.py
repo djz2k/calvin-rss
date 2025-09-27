@@ -13,7 +13,7 @@ HTML_FILE = "docs/index.html"
 FEED_TITLE = "Daily Calvin and Hobbes"
 FEED_LINK = "https://djz2k.github.io/calvin-rss/feed.xml"
 SITE_LINK = "https://djz2k.github.io/calvin-rss/"
-FEED_DESC = "One Calvin & Hobbes comic per day"
+FEED_DESC = "One Calvin &amp Hobbes comic per day"
 
 # === Helpers ===
 
