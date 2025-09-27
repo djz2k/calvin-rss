@@ -16,29 +16,32 @@ FEED_DESC = "One Calvin & Hobbes comic per day"
 
 # === Comic Logic ===
 def get_all_comics():
-    response = requests.get(HTML_URL)
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/117.0.0.0 Safari/537.36"
+        )
+    }
+    response = requests.get(HTML_URL, headers=headers)
     print(f"[DEBUG] HTTP Status: {response.status_code}")
     
     if response.status_code != 200:
         print("[ERROR] Failed to fetch the HTML page.")
         return []
 
-    # Show first 1000 characters of the page
-    preview = response.text[:1000]
-    print(f"[DEBUG] Page preview:\n{preview}\n--- END PREVIEW ---")
-
     soup = BeautifulSoup(response.text, "html.parser")
     imgs = soup.find_all("img")
     print(f"[DEBUG] Found {len(imgs)} <img> tags")
 
     for i, img in enumerate(imgs[:5]):
-        print(f"[DEBUG] Sample img[{i}]: {img.get('src')}")
+        print(f"[DEBUG] Sample img[{i+1}]: {img.get('src')}")
 
     comic_imgs = [img["src"] for img in imgs if img.get("src") and "calvinandhobbes" in img["src"]]
     print(f"[DEBUG] Filtered {len(comic_imgs)} Calvin & Hobbes comic images")
 
     return comic_imgs
-
+    
 def load_used():
     if Path(USED_FILE).exists():
         with open(USED_FILE, "r") as f:
