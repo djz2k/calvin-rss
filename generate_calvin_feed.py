@@ -9,8 +9,8 @@ USED_FILE = "used_comics.json"
 RSS_FILE = "docs/feed.xml"
 HTML_FILE = "docs/index.html"
 FEED_TITLE = "Daily Calvin and Hobbes"
-FEED_LINK = "https://your-username.github.io/calvin-rss/feed.xml"
-SITE_LINK = "https://your-username.github.io/calvin-rss/"
+FEED_LINK = "https://djz2k.github.io/calvin-rss/feed.xml"
+SITE_LINK = "https://djz2k.github.io/calvin-rss/"
 FEED_DESC = "One Calvin & Hobbes comic per day"
 
 def get_all_comics():
