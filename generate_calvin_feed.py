@@ -23,9 +23,11 @@ def get_all_comics():
             "Chrome/117.0.0.0 Safari/537.36"
         )
     }
+
+    print(f"[DEBUG] Fetching {HTML_URL} ...")
     response = requests.get(HTML_URL, headers=headers)
     print(f"[DEBUG] HTTP Status: {response.status_code}")
-    
+
     if response.status_code != 200:
         print("[ERROR] Failed to fetch the HTML page.")
         return []
@@ -34,11 +36,17 @@ def get_all_comics():
     imgs = soup.find_all("img")
     print(f"[DEBUG] Found {len(imgs)} <img> tags")
 
-    for i, img in enumerate(imgs[:5]):
-        print(f"[DEBUG] Sample img[{i+1}]: {img.get('src')}")
+    for i, img in enumerate(imgs[:10]):
+        print(f"[DEBUG] img[{i}].src = {img.get('src')}")
 
-    comic_imgs = [img["src"] for img in imgs if img.get("src") and "calvinandhobbes" in img["src"]]
-    print(f"[DEBUG] Filtered {len(comic_imgs)} Calvin & Hobbes comic images")
+    # Raw fallback in case nothing matches
+    comic_imgs = []
+    for img in imgs:
+        src = img.get("src", "")
+        if "calvinandhobbes" in src or "assets.s-anand.net" in src:
+            comic_imgs.append(src)
+
+    print(f"[DEBUG] Found {len(comic_imgs)} filtered Calvin & Hobbes image URLs")
 
     return comic_imgs
     
