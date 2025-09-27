@@ -17,20 +17,25 @@ FEED_DESC = "One Calvin & Hobbes comic per day"
 # === Comic Logic ===
 def get_all_comics():
     response = requests.get(HTML_URL)
-    print(f"[DEBUG] Status code: {response.status_code}")
-    html = response.text[:1000]  # print only first 1000 chars
-    print(f"[DEBUG] Page snippet:\n{html}\n--- END SNIPPET ---")
+    print(f"[DEBUG] HTTP Status: {response.status_code}")
+    
+    if response.status_code != 200:
+        print("[ERROR] Failed to fetch the HTML page.")
+        return []
+
+    # Show first 1000 characters of the page
+    preview = response.text[:1000]
+    print(f"[DEBUG] Page preview:\n{preview}\n--- END PREVIEW ---")
 
     soup = BeautifulSoup(response.text, "html.parser")
     imgs = soup.find_all("img")
-    print(f"[INFO] Found {len(imgs)} total <img> tags")
+    print(f"[DEBUG] Found {len(imgs)} <img> tags")
 
-    # print first 3 image URLs
-    for i, img in enumerate(imgs[:3]):
-        print(f"[DEBUG] Image {i+1}: {img.get('src')}")
+    for i, img in enumerate(imgs[:5]):
+        print(f"[DEBUG] Sample img[{i}]: {img.get('src')}")
 
-    comic_imgs = [img["src"] for img in imgs if "assets.s-anand.net/calvinandhobbes" in img.get("src", "")]
-    print(f"[INFO] Found {len(comic_imgs)} Calvin & Hobbes comic images.")
+    comic_imgs = [img["src"] for img in imgs if img.get("src") and "calvinandhobbes" in img["src"]]
+    print(f"[DEBUG] Filtered {len(comic_imgs)} Calvin & Hobbes comic images")
 
     return comic_imgs
 
