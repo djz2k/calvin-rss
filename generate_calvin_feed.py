@@ -4,6 +4,7 @@ import json
 import datetime
 from pathlib import Path
 
+# === Config ===
 HTML_URL = "https://www.s-anand.net/calvinandhobbes.html"
 USED_FILE = "used_comics.json"
 RSS_FILE = "docs/feed.xml"
@@ -13,11 +14,17 @@ FEED_LINK = "https://djz2k.github.io/calvin-rss/feed.xml"
 SITE_LINK = "https://djz2k.github.io/calvin-rss/"
 FEED_DESC = "One Calvin & Hobbes comic per day"
 
+# === Comic Logic ===
 def get_all_comics():
     html = requests.get(HTML_URL).text
     soup = BeautifulSoup(html, "html.parser")
     imgs = soup.find_all("img")
-    return [img["src"] for img in imgs if "calvinandhobbes" in img["src"]]
+    print(f"[INFO] Found {len(imgs)} total images on page.")
+    
+    comic_imgs = [img["src"] for img in imgs if "assets.s-anand.net/calvinandhobbes" in img["src"]]
+    print(f"[INFO] Found {len(comic_imgs)} Calvin & Hobbes comic images.")
+    
+    return comic_imgs
 
 def load_used():
     if Path(USED_FILE).exists():
@@ -29,6 +36,7 @@ def save_used(used):
     with open(USED_FILE, "w") as f:
         json.dump(sorted(used), f, indent=2)
 
+# === RSS Generation ===
 def write_rss(comic_url, pub_date):
     rss = f'''<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
@@ -51,6 +59,7 @@ def write_rss(comic_url, pub_date):
 </rss>'''
     Path(RSS_FILE).write_text(rss)
 
+# === HTML Open Graph for Social Sharing ===
 def write_html(comic_url):
     html = f'''<!DOCTYPE html>
 <html>
@@ -68,9 +77,11 @@ def write_html(comic_url):
 </html>'''
     Path(HTML_FILE).write_text(html)
 
+# === Main Logic ===
 def main():
     all_comics = get_all_comics()
     used = load_used()
+
     for comic_url in all_comics:
         if comic_url not in used:
             today = datetime.datetime.utcnow().strftime("%a, %d %b %Y 00:00:00 GMT")
@@ -78,10 +89,10 @@ def main():
             write_html(comic_url)
             used.add(comic_url)
             save_used(used)
-            print(f"Posted comic: {comic_url}")
-            break
-    else:
-        print("No new comics to post.")
+            print(f"[SUCCESS] Posted comic: {comic_url}")
+            return
+
+    print("[DONE] No new comics to post.")
 
 if __name__ == "__main__":
     main()
