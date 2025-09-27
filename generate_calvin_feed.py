@@ -39,7 +39,6 @@ def get_all_comics():
     for i, img in enumerate(imgs[:10]):
         print(f"[DEBUG] img[{i}].src = {img.get('src')}")
 
-    # Raw fallback in case nothing matches
     comic_imgs = []
     for img in imgs:
         src = img.get("src", "")
