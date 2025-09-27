@@ -4,7 +4,6 @@ import json
 import datetime
 from pathlib import Path
 
-# === Config ===
 HTML_URL = "https://www.s-anand.net/calvinandhobbes.html"
 USED_FILE = "used_comics.json"
 RSS_FILE = "docs/feed.xml"
@@ -14,7 +13,6 @@ FEED_LINK = "https://djz2k.github.io/calvin-rss/feed.xml"
 SITE_LINK = "https://djz2k.github.io/calvin-rss/"
 FEED_DESC = "One Calvin & Hobbes comic per day"
 
-# === Comic Logic ===
 def get_all_comics():
     headers = {
         "User-Agent": (
@@ -32,11 +30,14 @@ def get_all_comics():
         print("[ERROR] Failed to fetch the HTML page.")
         return []
 
+    preview = response.text[:500]
+    print(f"[DEBUG] HTML starts with:\n{preview}\n--- END PREVIEW ---")
+
     soup = BeautifulSoup(response.text, "html.parser")
     imgs = soup.find_all("img")
     print(f"[DEBUG] Found {len(imgs)} <img> tags")
 
-    for i, img in enumerate(imgs[:10]):
+    for i, img in enumerate(imgs[:5]):
         print(f"[DEBUG] img[{i}].src = {img.get('src')}")
 
     comic_imgs = []
@@ -45,10 +46,9 @@ def get_all_comics():
         if "calvinandhobbes" in src or "assets.s-anand.net" in src:
             comic_imgs.append(src)
 
-    print(f"[DEBUG] Found {len(comic_imgs)} filtered Calvin & Hobbes image URLs")
-
+    print(f"[DEBUG] Found {len(comic_imgs)} Calvin & Hobbes comic image URLs")
     return comic_imgs
-    
+
 def load_used():
     if Path(USED_FILE).exists():
         with open(USED_FILE, "r") as f:
@@ -59,7 +59,6 @@ def save_used(used):
     with open(USED_FILE, "w") as f:
         json.dump(sorted(used), f, indent=2)
 
-# === RSS Generation ===
 def write_rss(comic_url, pub_date):
     rss = f'''<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
@@ -82,7 +81,6 @@ def write_rss(comic_url, pub_date):
 </rss>'''
     Path(RSS_FILE).write_text(rss)
 
-# === HTML Open Graph for Social Sharing ===
 def write_html(comic_url):
     html = f'''<!DOCTYPE html>
 <html>
@@ -100,7 +98,6 @@ def write_html(comic_url):
 </html>'''
     Path(HTML_FILE).write_text(html)
 
-# === Main Logic ===
 def main():
     all_comics = get_all_comics()
     used = load_used()
