@@ -30,10 +30,13 @@ jobs:
       - name: Run generator script
         run: python generate_calvin_feed.py
 
+      - name: Touch feed.xml to ensure Git detects it
+        run: touch docs/feed.xml
+
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/*.xml docs/*.html used_comics.json
-          git commit -m "Update feed"
+          git add docs/*.xml docs/*.html used_comics.json || true
+          git commit -m "Update feed" --allow-empty
           git push
