@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import requests
 import json
-import html  # ← For escaping special characters
+import html
 
 # === Config ===
 START_DATE = datetime(1985, 11, 18)
@@ -13,7 +13,8 @@ HTML_FILE = "docs/index.html"
 FEED_TITLE = "Daily Calvin and Hobbes"
 FEED_LINK = "https://djz2k.github.io/calvin-rss/feed.xml"
 SITE_LINK = "https://djz2k.github.io/calvin-rss/"
-FEED_DESC = "One Calvin &amp Hobbes comic per day"
+FEED_DESC = "One Calvin & Hobbes comic per day"
+MAX_ITEMS = 50
 
 # === Helpers ===
 
@@ -47,15 +48,31 @@ def find_next_comic(used_dates):
         current += timedelta(days=1)
 
 def write_rss(comic_url, pub_date):
-    # Escape special characters
     title = html.escape(f"Calvin and Hobbes – {pub_date}")
     link = html.escape(SITE_LINK)
     guid = html.escape(comic_url)
     pub_date_escaped = html.escape(pub_date)
-
     description = f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
 
-    rss = f'''<?xml version="1.0" encoding="UTF-8" ?>
+    new_item = f"""  <item>
+    <title>{title}</title>
+    <link>{link}</link>
+    <guid>{guid}</guid>
+    <pubDate>{pub_date_escaped}</pubDate>
+    <description>{description}</description>
+    <enclosure url="{comic_url}" type="image/gif" />
+  </item>"""
+
+    if Path(RSS_FILE).exists():
+        existing = Path(RSS_FILE).read_text(encoding="utf-8")
+        before_items = existing.split("<item>")[0].rsplit("</lastBuildDate>", 1)[0] + "</lastBuildDate>\n"
+        existing_items = existing.split("<item>")
+        item_blocks = ["<item>" + block for block in existing_items[1:]]
+        item_blocks.insert(0, new_item.strip())
+        item_blocks = item_blocks[:MAX_ITEMS]
+        items_combined = "\n".join(item_blocks)
+    else:
+        before_items = f'''<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
   <title>{html.escape(FEED_TITLE)}</title>
@@ -63,18 +80,14 @@ def write_rss(comic_url, pub_date):
   <description>{html.escape(FEED_DESC)}</description>
   <language>en-us</language>
   <pubDate>{pub_date_escaped}</pubDate>
-  <lastBuildDate>{pub_date_escaped}</lastBuildDate>
-  <item>
-    <title>{title}</title>
-    <link>{link}</link>
-    <guid>{guid}</guid>
-    <pubDate>{pub_date_escaped}</pubDate>
-    <description>{description}</description>
-    <enclosure url="{comic_url}" type="image/gif" />
-  </item>
+  <lastBuildDate>{pub_date_escaped}</lastBuildDate>\n'''
+        items_combined = new_item.strip()
+
+    rss = f"""{before_items}{items_combined}
 </channel>
-</rss>'''
-    Path(RSS_FILE).write_text(rss)
+</rss>"""
+
+    Path(RSS_FILE).write_text(rss, encoding="utf-8")
 
 def write_html(comic_url):
     html_text = f'''<!DOCTYPE html>
