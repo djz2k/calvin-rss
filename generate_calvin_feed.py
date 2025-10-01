@@ -14,15 +14,14 @@ FEED_TITLE = "Daily Calvin and Hobbes"
 FEED_LINK = "https://djz2k.github.io/calvin-rss/feed.xml"
 SITE_LINK = "https://djz2k.github.io/calvin-rss/"
 FEED_DESC = "One Calvin & Hobbes comic per day"
-MAX_ITEMS = 50
 
 # === Helpers ===
 
 def load_used():
     if Path(USED_FILE).exists():
         with open(USED_FILE, "r") as f:
-            return set(json.load(f))
-    return set()
+            return sorted(json.load(f))
+    return []
 
 def save_used(used):
     with open(USED_FILE, "w") as f:
@@ -38,6 +37,7 @@ def check_url_exists(url):
     return r.status_code == 200
 
 def find_next_comic(used_dates):
+    # find the next date not used
     current = START_DATE
     while True:
         datestr = current.strftime("%Y-%m-%d")
@@ -47,47 +47,41 @@ def find_next_comic(used_dates):
                 return current, url
         current += timedelta(days=1)
 
-def write_rss(comic_url, pub_date):
-    title = html.escape(f"Calvin and Hobbes – {pub_date}")
-    link = html.escape(SITE_LINK)
-    guid = html.escape(comic_url)
-    pub_date_escaped = html.escape(pub_date)
-    description = f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
-
-    new_item = f"""  <item>
+def build_rss(all_dates):
+    # Build full RSS from scratch
+    items = []
+    for datestr in all_dates:
+        date_obj = datetime.strptime(datestr, "%Y-%m-%d")
+        comic_url = date_to_url(date_obj)
+        pub_date = date_obj.strftime("%a, %d %b %Y 00:00:00 GMT")
+        title = html.escape(f"Calvin and Hobbes – {pub_date}")
+        description = f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
+        items.append(f"""
+  <item>
     <title>{title}</title>
-    <link>{link}</link>
-    <guid>{guid}</guid>
-    <pubDate>{pub_date_escaped}</pubDate>
+    <link>{SITE_LINK}</link>
+    <guid>{comic_url}</guid>
+    <pubDate>{pub_date}</pubDate>
     <description>{description}</description>
     <enclosure url="{comic_url}" type="image/gif" />
-  </item>"""
+  </item>""")
+    # last pubDate = newest
+    last_date = datetime.strptime(all_dates[-1], "%Y-%m-%d")
+    last_pub = last_date.strftime("%a, %d %b %Y 00:00:00 GMT")
 
-    if Path(RSS_FILE).exists():
-        existing = Path(RSS_FILE).read_text(encoding="utf-8")
-        before_items = existing.split("<item>")[0].rsplit("</lastBuildDate>", 1)[0] + "</lastBuildDate>\n"
-        existing_items = existing.split("<item>")
-        item_blocks = ["<item>" + block for block in existing_items[1:]]
-        item_blocks.insert(0, new_item.strip())
-        item_blocks = item_blocks[:MAX_ITEMS]
-        items_combined = "\n".join(item_blocks)
-    else:
-        before_items = f'''<?xml version="1.0" encoding="UTF-8" ?>
+    rss = f'''<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
   <title>{html.escape(FEED_TITLE)}</title>
   <link>{html.escape(FEED_LINK)}</link>
   <description>{html.escape(FEED_DESC)}</description>
   <language>en-us</language>
-  <pubDate>{pub_date_escaped}</pubDate>
-  <lastBuildDate>{pub_date_escaped}</lastBuildDate>\n'''
-        items_combined = new_item.strip()
-
-    rss = f"""{before_items}{items_combined}
+  <pubDate>{last_pub}</pubDate>
+  <lastBuildDate>{last_pub}</lastBuildDate>
+{"".join(items)}
 </channel>
-</rss>"""
-
-    Path(RSS_FILE).write_text(rss, encoding="utf-8")
+</rss>'''
+    Path(RSS_FILE).write_text(rss)
 
 def write_html(comic_url):
     html_text = f'''<!DOCTYPE html>
@@ -112,13 +106,16 @@ def main():
     used = load_used()
     next_date, comic_url = find_next_comic(used)
     datestr = next_date.strftime("%Y-%m-%d")
-    pub_date_rss = next_date.strftime("%a, %d %b %Y 00:00:00 GMT")
 
-    write_rss(comic_url, pub_date_rss)
+    used.append(datestr)
+    save_used(used)
+
+    # Build feed from all used dates
+    build_rss(used)
+
+    # Update HTML to latest comic
     write_html(comic_url)
 
-    used.add(datestr)
-    save_used(used)
     print(f"[SUCCESS] Posted comic for {datestr}: {comic_url}")
 
 if __name__ == "__main__":
