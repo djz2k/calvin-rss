@@ -1,52 +1,59 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <rss version="2.0">
-<channel>
-  <title>Daily Calvin and Hobbes</title>
-  <link>https://djz2k.github.io/calvin-rss/feed.xml</link>
-  <description>One Calvin &amp; Hobbes comic per day</description>
-  <language>en-us</language>
-  <pubDate>Fri, 22 Nov 1985 00:00:00 GMT</pubDate>
-  <lastBuildDate>Fri, 22 Nov 1985 00:00:00 GMT</lastBuildDate>
-
-  <item>
-    <title>Calvin and Hobbes – Mon, 18 Nov 1985 00:00:00 GMT</title>
-    <link>https://djz2k.github.io/calvin-rss/</link>
-    <guid>https://picayune.uclick.com/comics/ch/1985/ch851118.gif</guid>
-    <pubDate>Mon, 18 Nov 1985 00:00:00 GMT</pubDate>
-    <description><![CDATA[<img src="https://picayune.uclick.com/comics/ch/1985/ch851118.gif" alt="Calvin and Hobbes comic" />]]></description>
-    <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851118.gif" type="image/gif" />
-  </item>
-  <item>
-    <title>Calvin and Hobbes – Tue, 19 Nov 1985 00:00:00 GMT</title>
-    <link>https://djz2k.github.io/calvin-rss/</link>
-    <guid>https://picayune.uclick.com/comics/ch/1985/ch851119.gif</guid>
-    <pubDate>Tue, 19 Nov 1985 00:00:00 GMT</pubDate>
-    <description><![CDATA[<img src="https://picayune.uclick.com/comics/ch/1985/ch851119.gif" alt="Calvin and Hobbes comic" />]]></description>
-    <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851119.gif" type="image/gif" />
-  </item>
-  <item>
-    <title>Calvin and Hobbes – Wed, 20 Nov 1985 00:00:00 GMT</title>
-    <link>https://djz2k.github.io/calvin-rss/</link>
-    <guid>https://picayune.uclick.com/comics/ch/1985/ch851120.gif</guid>
-    <pubDate>Wed, 20 Nov 1985 00:00:00 GMT</pubDate>
-    <description><![CDATA[<img src="https://picayune.uclick.com/comics/ch/1985/ch851120.gif" alt="Calvin and Hobbes comic" />]]></description>
-    <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851120.gif" type="image/gif" />
-  </item>
-  <item>
-    <title>Calvin and Hobbes – Thu, 21 Nov 1985 00:00:00 GMT</title>
-    <link>https://djz2k.github.io/calvin-rss/</link>
-    <guid>https://picayune.uclick.com/comics/ch/1985/ch851121.gif</guid>
-    <pubDate>Thu, 21 Nov 1985 00:00:00 GMT</pubDate>
-    <description><![CDATA[<img src="https://picayune.uclick.com/comics/ch/1985/ch851121.gif" alt="Calvin and Hobbes comic" />]]></description>
-    <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851121.gif" type="image/gif" />
-  </item>
-  <item>
-    <title>Calvin and Hobbes – Fri, 22 Nov 1985 00:00:00 GMT</title>
-    <link>https://djz2k.github.io/calvin-rss/</link>
-    <guid>https://picayune.uclick.com/comics/ch/1985/ch851122.gif</guid>
-    <pubDate>Fri, 22 Nov 1985 00:00:00 GMT</pubDate>
-    <description><![CDATA[<img src="https://picayune.uclick.com/comics/ch/1985/ch851122.gif" alt="Calvin and Hobbes comic" />]]></description>
-    <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851122.gif" type="image/gif" />
-  </item>
-</channel>
+  <channel>
+    <title>Daily Calvin and Hobbes</title>
+    <link>https://djz2k.github.io/calvin-rss/feed.xml</link>
+    <description>One Calvin &amp; Hobbes comic per day</description>
+    <language>en-us</language>
+    <pubDate>Sat, 23 Nov 1985 00:00:00 GMT</pubDate>
+    <lastBuildDate>Sat, 23 Nov 1985 00:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Calvin and Hobbes – Sat, 23 Nov 1985 00:00:00 GMT</title>
+      <link>https://djz2k.github.io/calvin-rss/</link>
+      <guid>https://picayune.uclick.com/comics/ch/1985/ch851123.gif</guid>
+      <pubDate>Sat, 23 Nov 1985 00:00:00 GMT</pubDate>
+      <description>&lt;![CDATA[&lt;img src="https://picayune.uclick.com/comics/ch/1985/ch851123.gif" alt="Calvin and Hobbes comic" /&gt;]]&gt;</description>
+      <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851123.gif" type="image/gif" />
+    </item>
+    <item>
+      <title>Calvin and Hobbes – Mon, 18 Nov 1985 00:00:00 GMT</title>
+      <link>https://djz2k.github.io/calvin-rss/</link>
+      <guid>https://picayune.uclick.com/comics/ch/1985/ch851118.gif</guid>
+      <pubDate>Mon, 18 Nov 1985 00:00:00 GMT</pubDate>
+      <description>&lt;img src="https://picayune.uclick.com/comics/ch/1985/ch851118.gif" alt="Calvin and Hobbes comic" /&gt;</description>
+      <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851118.gif" type="image/gif" />
+    </item>
+    <item>
+      <title>Calvin and Hobbes – Tue, 19 Nov 1985 00:00:00 GMT</title>
+      <link>https://djz2k.github.io/calvin-rss/</link>
+      <guid>https://picayune.uclick.com/comics/ch/1985/ch851119.gif</guid>
+      <pubDate>Tue, 19 Nov 1985 00:00:00 GMT</pubDate>
+      <description>&lt;img src="https://picayune.uclick.com/comics/ch/1985/ch851119.gif" alt="Calvin and Hobbes comic" /&gt;</description>
+      <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851119.gif" type="image/gif" />
+    </item>
+    <item>
+      <title>Calvin and Hobbes – Wed, 20 Nov 1985 00:00:00 GMT</title>
+      <link>https://djz2k.github.io/calvin-rss/</link>
+      <guid>https://picayune.uclick.com/comics/ch/1985/ch851120.gif</guid>
+      <pubDate>Wed, 20 Nov 1985 00:00:00 GMT</pubDate>
+      <description>&lt;img src="https://picayune.uclick.com/comics/ch/1985/ch851120.gif" alt="Calvin and Hobbes comic" /&gt;</description>
+      <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851120.gif" type="image/gif" />
+    </item>
+    <item>
+      <title>Calvin and Hobbes – Thu, 21 Nov 1985 00:00:00 GMT</title>
+      <link>https://djz2k.github.io/calvin-rss/</link>
+      <guid>https://picayune.uclick.com/comics/ch/1985/ch851121.gif</guid>
+      <pubDate>Thu, 21 Nov 1985 00:00:00 GMT</pubDate>
+      <description>&lt;img src="https://picayune.uclick.com/comics/ch/1985/ch851121.gif" alt="Calvin and Hobbes comic" /&gt;</description>
+      <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851121.gif" type="image/gif" />
+    </item>
+    <item>
+      <title>Calvin and Hobbes – Fri, 22 Nov 1985 00:00:00 GMT</title>
+      <link>https://djz2k.github.io/calvin-rss/</link>
+      <guid>https://picayune.uclick.com/comics/ch/1985/ch851122.gif</guid>
+      <pubDate>Fri, 22 Nov 1985 00:00:00 GMT</pubDate>
+      <description>&lt;img src="https://picayune.uclick.com/comics/ch/1985/ch851122.gif" alt="Calvin and Hobbes comic" /&gt;</description>
+      <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851122.gif" type="image/gif" />
+    </item>
+  </channel>
 </rss>
