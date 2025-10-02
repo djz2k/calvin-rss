@@ -3,6 +3,7 @@ from pathlib import Path
 import requests
 import json
 import html
+import xml.etree.ElementTree as ET
 
 # === Config ===
 START_DATE = datetime(1985, 11, 18)
@@ -14,14 +15,15 @@ FEED_TITLE = "Daily Calvin and Hobbes"
 FEED_LINK = "https://djz2k.github.io/calvin-rss/feed.xml"
 SITE_LINK = "https://djz2k.github.io/calvin-rss/"
 FEED_DESC = "One Calvin & Hobbes comic per day"
+MAX_ITEMS = 50
 
 # === Helpers ===
 
 def load_used():
     if Path(USED_FILE).exists():
         with open(USED_FILE, "r") as f:
-            return sorted(json.load(f))
-    return []
+            return set(json.load(f))
+    return set()
 
 def save_used(used):
     with open(USED_FILE, "w") as f:
@@ -37,7 +39,6 @@ def check_url_exists(url):
     return r.status_code == 200
 
 def find_next_comic(used_dates):
-    # find the next date not used
     current = START_DATE
     while True:
         datestr = current.strftime("%Y-%m-%d")
@@ -47,41 +48,58 @@ def find_next_comic(used_dates):
                 return current, url
         current += timedelta(days=1)
 
-def build_rss(all_dates):
-    # Build full RSS from scratch
+def build_rss_items(latest_date, comic_url):
     items = []
-    for datestr in all_dates:
-        date_obj = datetime.strptime(datestr, "%Y-%m-%d")
-        comic_url = date_to_url(date_obj)
-        pub_date = date_obj.strftime("%a, %d %b %Y 00:00:00 GMT")
-        title = html.escape(f"Calvin and Hobbes – {pub_date}")
-        description = f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
-        items.append(f"""
-  <item>
-    <title>{title}</title>
-    <link>{SITE_LINK}</link>
-    <guid>{comic_url}</guid>
-    <pubDate>{pub_date}</pubDate>
-    <description>{description}</description>
-    <enclosure url="{comic_url}" type="image/gif" />
-  </item>""")
-    # last pubDate = newest
-    last_date = datetime.strptime(all_dates[-1], "%Y-%m-%d")
-    last_pub = last_date.strftime("%a, %d %b %Y 00:00:00 GMT")
 
-    rss = f'''<?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0">
-<channel>
-  <title>{html.escape(FEED_TITLE)}</title>
-  <link>{html.escape(FEED_LINK)}</link>
-  <description>{html.escape(FEED_DESC)}</description>
-  <language>en-us</language>
-  <pubDate>{last_pub}</pubDate>
-  <lastBuildDate>{last_pub}</lastBuildDate>
-{"".join(items)}
-</channel>
-</rss>'''
-    Path(RSS_FILE).write_text(rss)
+    pub_date_str = latest_date.strftime("%a, %d %b %Y 00:00:00 GMT")
+    title = f"Calvin and Hobbes – {pub_date_str}"
+
+    item = ET.Element("item")
+    ET.SubElement(item, "title").text = title
+    ET.SubElement(item, "link").text = SITE_LINK
+    ET.SubElement(item, "guid").text = comic_url
+    ET.SubElement(item, "pubDate").text = pub_date_str
+    description = ET.SubElement(item, "description")
+    description.text = f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
+    enclosure = ET.SubElement(item, "enclosure", attrib={
+        "url": comic_url,
+        "type": "image/gif"
+    })
+
+    # Add the new item to the top
+    items.append(item)
+
+    # Append previous items if RSS file exists
+    if Path(RSS_FILE).exists():
+        tree = ET.parse(RSS_FILE)
+        root = tree.getroot()
+        channel = root.find("channel")
+        if channel is not None:
+            old_items = channel.findall("item")
+            for old_item in old_items:
+                if len(items) >= MAX_ITEMS:
+                    break
+                items.append(old_item)
+
+    return items
+
+def write_rss(comic_url, pub_date, items):
+    rss = ET.Element("rss", version="2.0")
+    channel = ET.SubElement(rss, "channel")
+
+    ET.SubElement(channel, "title").text = FEED_TITLE
+    ET.SubElement(channel, "link").text = FEED_LINK
+    ET.SubElement(channel, "description").text = FEED_DESC
+    ET.SubElement(channel, "language").text = "en-us"
+    ET.SubElement(channel, "pubDate").text = pub_date
+    ET.SubElement(channel, "lastBuildDate").text = pub_date
+
+    for item in items:
+        channel.append(item)
+
+    tree = ET.ElementTree(rss)
+    ET.indent(tree, space="  ", level=0)
+    tree.write(RSS_FILE, encoding="utf-8", xml_declaration=True)
 
 def write_html(comic_url):
     html_text = f'''<!DOCTYPE html>
@@ -106,16 +124,14 @@ def main():
     used = load_used()
     next_date, comic_url = find_next_comic(used)
     datestr = next_date.strftime("%Y-%m-%d")
+    pub_date_rss = next_date.strftime("%a, %d %b %Y 00:00:00 GMT")
 
-    used.append(datestr)
-    save_used(used)
-
-    # Build feed from all used dates
-    build_rss(used)
-
-    # Update HTML to latest comic
+    items = build_rss_items(next_date, comic_url)
+    write_rss(comic_url, pub_date_rss, items)
     write_html(comic_url)
 
+    used.add(datestr)
+    save_used(used)
     print(f"[SUCCESS] Posted comic for {datestr}: {comic_url}")
 
 if __name__ == "__main__":
