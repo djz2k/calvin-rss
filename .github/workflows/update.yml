@@ -5,11 +5,12 @@ on:
     - cron: '0 7 * * *'  # Daily at 07:00 UTC
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update-feed:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout code using GH_PAT
@@ -30,13 +31,20 @@ jobs:
       - name: Run generator script
         run: python generate_calvin_feed.py
 
-      - name: Touch feed.xml to ensure Git detects it
-        run: touch docs/feed.xml
+      - name: Touch file to ensure commit always happens
+        run: |
+          touch .last_run
+          touch docs/feed.xml  # extra safety if needed
+
+      - name: Show git status and diff (for debugging)
+        run: |
+          git status
+          git diff || true
 
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/*.xml docs/*.html used_comics.json || true
-          git commit -m "Update feed" --allow-empty
+          git add docs/*.xml docs/*.html used_comics.json .last_run || true
+          git commit -m "Update Calvin & Hobbes feed" --allow-empty
           git push
