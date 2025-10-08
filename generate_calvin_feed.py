@@ -17,8 +17,6 @@ SITE_LINK = "https://djz2k.github.io/calvin-rss/"
 FEED_DESC = "One Calvin & Hobbes comic per day"
 MAX_ITEMS = 50
 
-# === Helpers ===
-
 def load_used():
     if Path(USED_FILE).exists():
         with open(USED_FILE, "r") as f:
@@ -35,8 +33,11 @@ def date_to_url(date):
     return BASE_URL.format(year=year, shortdate=shortdate)
 
 def check_url_exists(url):
-    r = requests.head(url)
-    return r.status_code == 200
+    try:
+        r = requests.head(url, headers={"User-Agent": "Mozilla/5.0"})
+        return r.status_code == 200
+    except Exception:
+        return False
 
 def find_next_comic(used_dates):
     current = START_DATE
@@ -59,31 +60,31 @@ def build_rss_items(latest_date, comic_url):
     ET.SubElement(item, "link").text = SITE_LINK
     ET.SubElement(item, "guid").text = comic_url
     ET.SubElement(item, "pubDate").text = pub_date_str
-    description = ET.SubElement(item, "description")
-    description.text = f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
-    enclosure = ET.SubElement(item, "enclosure", attrib={
+    ET.SubElement(item, "description").text = f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
+    ET.SubElement(item, "enclosure", attrib={
         "url": comic_url,
         "type": "image/gif"
     })
 
-    # Add the new item to the top
     items.append(item)
 
-    # Append previous items if RSS file exists
+    # Append existing items
     if Path(RSS_FILE).exists():
-        tree = ET.parse(RSS_FILE)
-        root = tree.getroot()
-        channel = root.find("channel")
-        if channel is not None:
-            old_items = channel.findall("item")
-            for old_item in old_items:
-                if len(items) >= MAX_ITEMS:
-                    break
-                items.append(old_item)
+        try:
+            tree = ET.parse(RSS_FILE)
+            root = tree.getroot()
+            channel = root.find("channel")
+            if channel is not None:
+                for old_item in channel.findall("item"):
+                    if len(items) >= MAX_ITEMS:
+                        break
+                    items.append(old_item)
+        except ET.ParseError:
+            print("[WARN] Failed to parse existing feed.xml, skipping old items")
 
     return items
 
-def write_rss(comic_url, pub_date, items):
+def write_rss(pub_date, items):
     rss = ET.Element("rss", version="2.0")
     channel = ET.SubElement(rss, "channel")
 
@@ -118,8 +119,6 @@ def write_html(comic_url):
 </html>'''
     Path(HTML_FILE).write_text(html_text)
 
-# === Main ===
-
 def main():
     used = load_used()
     next_date, comic_url = find_next_comic(used)
@@ -127,7 +126,7 @@ def main():
     pub_date_rss = next_date.strftime("%a, %d %b %Y 00:00:00 GMT")
 
     items = build_rss_items(next_date, comic_url)
-    write_rss(comic_url, pub_date_rss, items)
+    write_rss(pub_date_rss, items)
     write_html(comic_url)
 
     used.add(datestr)
