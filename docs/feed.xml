@@ -5,8 +5,16 @@
     <link>https://djz2k.github.io/calvin-rss/feed.xml</link>
     <description>One Calvin &amp; Hobbes comic per day</description>
     <language>en-us</language>
-    <pubDate>Sat, 14 Dec 1985 00:00:00 GMT</pubDate>
-    <lastBuildDate>Sat, 14 Dec 1985 00:00:00 GMT</lastBuildDate>
+    <pubDate>Sun, 15 Dec 1985 00:00:00 GMT</pubDate>
+    <lastBuildDate>Sun, 15 Dec 1985 00:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Calvin and Hobbes – Sun, 15 Dec 1985 00:00:00 GMT</title>
+      <link>https://djz2k.github.io/calvin-rss/</link>
+      <guid>https://picayune.uclick.com/comics/ch/1985/ch851215.gif</guid>
+      <pubDate>Sun, 15 Dec 1985 00:00:00 GMT</pubDate>
+      <description>&lt;![CDATA[&lt;img src="https://picayune.uclick.com/comics/ch/1985/ch851215.gif" alt="Calvin and Hobbes comic" /&gt;]]&gt;</description>
+      <enclosure url="https://picayune.uclick.com/comics/ch/1985/ch851215.gif" type="image/gif" />
+    </item>
     <item>
       <title>Calvin and Hobbes – Sat, 14 Dec 1985 00:00:00 GMT</title>
       <link>https://djz2k.github.io/calvin-rss/</link>
