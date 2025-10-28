@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import requests
 import json
-import html
 import xml.etree.ElementTree as ET
 
 # === Config ===
@@ -17,13 +16,11 @@ SITE_LINK = "https://djz2k.github.io/calvin-rss/"
 FEED_DESC = "One Calvin & Hobbes comic per day"
 MAX_ITEMS = 50
 
-
-# === Helpers ===
 def load_used():
     if Path(USED_FILE).exists():
         with open(USED_FILE, "r") as f:
-            return sorted(json.load(f))
-    return []
+            return set(json.load(f))
+    return set()
 
 def save_used(used):
     with open(USED_FILE, "w") as f:
@@ -36,44 +33,43 @@ def date_to_url(date):
 
 def check_url_exists(url):
     try:
-        r = requests.head(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        r = requests.head(url, headers={"User-Agent": "Mozilla/5.0"})
         return r.status_code == 200
     except Exception:
         return False
 
 def find_next_comic(used_dates):
-    # start the search from one day after the most recent used date
-    if used_dates:
-        last_date = datetime.strptime(used_dates[-1], "%Y-%m-%d")
-        current = last_date + timedelta(days=1)
-    else:
-        current = START_DATE
-
+    current = START_DATE
     while True:
         datestr = current.strftime("%Y-%m-%d")
-        url = date_to_url(current)
-        if check_url_exists(url):
-            print(f"[DEBUG] Found next comic {datestr} at {url}")
-            return current, url
+        if datestr not in used_dates:
+            url = date_to_url(current)
+            if check_url_exists(url):
+                print(f"[DEBUG] Found next comic {datestr} at {url}")
+                return current, url
         current += timedelta(days=1)
 
 def build_rss_items(latest_date, comic_url):
+    items = []
+
     pub_date_str = latest_date.strftime("%a, %d %b %Y 00:00:00 GMT")
     title = f"Calvin and Hobbes – {pub_date_str}"
+    link_url = f"{SITE_LINK}calvin-{latest_date.strftime('%Y-%m-%d')}.html"
 
     item = ET.Element("item")
     ET.SubElement(item, "title").text = title
-    ET.SubElement(item, "link").text = SITE_LINK
-    ET.SubElement(item, "guid").text = comic_url
+    ET.SubElement(item, "link").text = link_url
+    ET.SubElement(item, "guid").text = link_url
     ET.SubElement(item, "pubDate").text = pub_date_str
-    ET.SubElement(item, "description").text = (
-        f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
-    )
-    ET.SubElement(item, "enclosure", attrib={"url": comic_url, "type": "image/gif"})
+    ET.SubElement(item, "description").text = f'<![CDATA[<img src="{comic_url}" alt="Calvin and Hobbes comic" />]]>'
+    ET.SubElement(item, "enclosure", attrib={
+        "url": comic_url,
+        "type": "image/gif"
+    })
 
-    items = [item]
+    items.append(item)
 
-    # append existing items (keep previous MAX_ITEMS - 1)
+    # Append existing items
     if Path(RSS_FILE).exists():
         try:
             tree = ET.parse(RSS_FILE)
@@ -85,13 +81,14 @@ def build_rss_items(latest_date, comic_url):
                         break
                     items.append(old_item)
         except ET.ParseError:
-            print("[WARN] Could not parse existing feed.xml")
+            print("[WARN] Failed to parse existing feed.xml, skipping old items")
 
     return items
 
 def write_rss(pub_date, items):
     rss = ET.Element("rss", version="2.0")
     channel = ET.SubElement(rss, "channel")
+
     ET.SubElement(channel, "title").text = FEED_TITLE
     ET.SubElement(channel, "link").text = FEED_LINK
     ET.SubElement(channel, "description").text = FEED_DESC
@@ -106,21 +103,27 @@ def write_rss(pub_date, items):
     ET.indent(tree, space="  ", level=0)
     tree.write(RSS_FILE, encoding="utf-8", xml_declaration=True)
 
-def write_html(comic_url):
-    html_text = f"""<!DOCTYPE html>
+def write_html(comic_url, date):
+    """Write both index.html and dated HTML page for the comic"""
+    date_str = date.strftime("%Y-%m-%d")
+    filename = f"docs/calvin-{date_str}.html"
+
+    html_text = f'''<!DOCTYPE html>
 <html>
 <head>
-  <meta charset='UTF-8'>
-  <meta property='og:title' content='Daily Calvin and Hobbes' />
-  <meta property='og:image' content='{comic_url}' />
-  <meta name='twitter:card' content='summary_large_image' />
-  <title>Daily Calvin and Hobbes</title>
+  <meta charset="UTF-8">
+  <meta property="og:title" content="Calvin and Hobbes – {date_str}" />
+  <meta property="og:image" content="{comic_url}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <title>Calvin and Hobbes – {date_str}</title>
 </head>
 <body>
-  <h1>Daily Calvin and Hobbes</h1>
-  <img src='{comic_url}' alt='Calvin and Hobbes comic'/>
+  <h1>Calvin and Hobbes – {date_str}</h1>
+  <img src="{comic_url}" alt="Calvin and Hobbes comic"/>
 </body>
-</html>"""
+</html>'''
+
+    Path(filename).write_text(html_text)
     Path(HTML_FILE).write_text(html_text)
 
 def main():
@@ -131,9 +134,9 @@ def main():
 
     items = build_rss_items(next_date, comic_url)
     write_rss(pub_date_rss, items)
-    write_html(comic_url)
+    write_html(comic_url, next_date)
 
-    used.append(datestr)
+    used.add(datestr)
     save_used(used)
     print(f"[SUCCESS] Posted comic for {datestr}: {comic_url}")
 
