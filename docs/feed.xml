@@ -5,8 +5,16 @@
     <link>https://djz2k.github.io/calvin-rss/feed.xml</link>
     <description>One Calvin &amp; Hobbes comic per day</description>
     <language>en-us</language>
-    <pubDate>Wed, 21 May 1986 00:00:00 GMT</pubDate>
-    <lastBuildDate>Wed, 21 May 1986 00:00:00 GMT</lastBuildDate>
+    <pubDate>Thu, 22 May 1986 00:00:00 GMT</pubDate>
+    <lastBuildDate>Thu, 22 May 1986 00:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Calvin and Hobbes – Thu, 22 May 1986 00:00:00 GMT</title>
+      <link>https://djz2k.github.io/calvin-rss/calvin-1986-05-22.html</link>
+      <guid>https://djz2k.github.io/calvin-rss/calvin-1986-05-22.html</guid>
+      <pubDate>Thu, 22 May 1986 00:00:00 GMT</pubDate>
+      <description>&lt;![CDATA[&lt;img src="https://picayune.uclick.com/comics/ch/1986/ch860522.gif" alt="Calvin and Hobbes comic" /&gt;]]&gt;</description>
+      <enclosure url="https://picayune.uclick.com/comics/ch/1986/ch860522.gif" type="image/gif" />
+    </item>
     <item>
       <title>Calvin and Hobbes – Wed, 21 May 1986 00:00:00 GMT</title>
       <link>https://djz2k.github.io/calvin-rss/calvin-1986-05-21.html</link>
@@ -398,14 +406,6 @@
       <pubDate>Thu, 03 Apr 1986 00:00:00 GMT</pubDate>
       <description>&lt;![CDATA[&lt;img src="https://picayune.uclick.com/comics/ch/1986/ch860403.gif" alt="Calvin and Hobbes comic" /&gt;]]&gt;</description>
       <enclosure url="https://picayune.uclick.com/comics/ch/1986/ch860403.gif" type="image/gif" />
-    </item>
-    <item>
-      <title>Calvin and Hobbes – Wed, 02 Apr 1986 00:00:00 GMT</title>
-      <link>https://djz2k.github.io/calvin-rss/calvin-1986-04-02.html</link>
-      <guid>https://djz2k.github.io/calvin-rss/calvin-1986-04-02.html</guid>
-      <pubDate>Wed, 02 Apr 1986 00:00:00 GMT</pubDate>
-      <description>&lt;![CDATA[&lt;img src="https://picayune.uclick.com/comics/ch/1986/ch860402.gif" alt="Calvin and Hobbes comic" /&gt;]]&gt;</description>
-      <enclosure url="https://picayune.uclick.com/comics/ch/1986/ch860402.gif" type="image/gif" />
     </item>
   </channel>
 </rss>
